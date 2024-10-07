@@ -1,3 +1,11 @@
 {
+<<<<<<< HEAD
   "extends": ["next/core-web-vitals", "next/typescript"]
+=======
+  "rules": {
+    "@typescript-eslint/no-explicit-any": "off"
+  },
+  "extends": ["next/core-web-vitals", "next/typescript"]
+  
+>>>>>>> 3f31b618e627b117f5778ffab5b3b529932a5bf9
 }
