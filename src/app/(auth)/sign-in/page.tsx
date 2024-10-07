@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -39,7 +38,6 @@ const SignInPage = () => {
 
   const onSubmit = async (data: SignInFormValues) => {
     setIsSubmitting(true);
-    console.log(data);
 
     const result = await signIn("credentials", {
       redirect: false,

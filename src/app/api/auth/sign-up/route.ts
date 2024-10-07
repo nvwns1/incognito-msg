@@ -9,6 +9,7 @@ export async function POST(request: Request) {
   await dbConnection();
   try {
     const body = await request.json();
+
     const validationResult = signUpSchema.safeParse(body);
 
     if (!validationResult.success) {
