@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 "use client";
 import { Button } from "@/components/ui/button";
 import { signOut, useSession } from "next-auth/react";
@@ -30,12 +29,3 @@ const DashBoardPage = () => {
 };
 
 export default DashBoardPage;
-=======
-import React from "react";
-
-const Dashbaord = () => {
-  return <div></div>;
-};
-
-export default Dashbaord;
->>>>>>> 3f31b618e627b117f5778ffab5b3b529932a5bf9
