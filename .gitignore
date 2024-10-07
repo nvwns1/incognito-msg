@@ -2,9 +2,6 @@
 
 # Environmental Config
 .env*
-!.env.sample
-!.env.example
-!.env.default
 
 # dependencies
 /node_modules
