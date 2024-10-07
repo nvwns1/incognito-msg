@@ -43,13 +43,15 @@ export async function POST(request: Request) {
       });
     }
     const currentDate = new Date();
-    if (currentDate > user.codeExpiry) {
+    if (!user.codeExpiry || currentDate > user?.codeExpiry) {
       return createResponse({
         success: false,
         message: "Code expired",
         status: 400,
       });
     }
+    user.code = "";
+    user.codeExpiry = null;
     user.isVerified = true;
     await user.save();
     return createResponse({

@@ -2,10 +2,10 @@ import mongoose, { Schema } from "mongoose";
 
 export interface IUser {
   email: string;
-  name: string;
+  username: string;
   password: string;
   code: string;
-  codeExpiry: Date;
+  codeExpiry: Date | null;
   isVerified: boolean;
   isAcceptingMessages: boolean;
   message: IMessage[];
@@ -30,9 +30,9 @@ const UserSchema: Schema<IUser> = new Schema({
     required: [true, "Email is required"],
     match: [/.+\@.+\..+/, "Please use a valid email Address"],
   },
-  name: {
+  username: {
     type: String,
-    required: [true, "Name is required"],
+    required: [true, "Username is required"],
     trim: true,
     match: [/^[a-zA-Z0-9]+$/, "Name is invalid"],
   },
@@ -41,8 +41,8 @@ const UserSchema: Schema<IUser> = new Schema({
     required: [true, "Password is required"],
     minlength: [6, "Password must be minimum 6 characters"],
   },
-  code: { type: String, required: true },
-  codeExpiry: { type: Date, required: true },
+  code: { type: String, required: false },
+  codeExpiry: { type: Date, default: null, required: false },
   isVerified: { type: Boolean, default: false },
   isAcceptingMessages: { type: Boolean, default: true, required: true },
   message: [MessageSchema],
