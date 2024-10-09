@@ -20,7 +20,7 @@ export async function POST(request: Request) {
   try {
     const { username, content } = validationResult.data;
 
-    const user = await UserModel.findOneAndUpdate({ username });
+    const user = await UserModel.findOne({ username });
     if (!user) {
       return createResponse({
         success: false,
@@ -28,6 +28,7 @@ export async function POST(request: Request) {
         status: 404,
       });
     }
+
     if (!user.isAcceptingMessages) {
       return createResponse({
         success: false,
