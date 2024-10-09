@@ -120,9 +120,9 @@ const SignUpPage = () => {
         </form>
       </Form>
       <p>
-        Don&apos;t have an account?{" "}
-        <Link className="underline hover:text-gray-500" href="/sign-up">
-          Sign Up
+        Already have an account?{" "}
+        <Link className="underline hover:text-gray-500" href="/sign-in">
+          Sign In
         </Link>
       </p>
     </>
