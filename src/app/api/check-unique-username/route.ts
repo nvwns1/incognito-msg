@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import dbConnection from "@/lib/dbConnection";
 import UserModel from "@/model/User.model";
 import { createResponse } from "@/types/JsonResponse";

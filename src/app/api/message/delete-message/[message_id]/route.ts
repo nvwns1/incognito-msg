@@ -4,7 +4,7 @@ import UserModel from "@/model/User.model";
 import { createResponse } from "@/types/JsonResponse";
 import { getServerSession, User } from "next-auth";
 
-export async function Delete(
+export async function DELETE(
   request: Request,
   { params }: { params: { message_id: string } }
 ) {
@@ -12,10 +12,18 @@ export async function Delete(
 
   const message_id = params.message_id;
 
+  if (!message_id) {
+    return createResponse({
+      success: false,
+      message: "Invalid request",
+      status: 400,
+    });
+  }
+
   const session = await getServerSession(options);
   const user: User = session?.user as User;
 
-  if (!session || !session.user) {
+  if (!session || !user) {
     return createResponse({
       success: false,
       message: "Unauthorized",
