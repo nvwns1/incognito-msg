@@ -10,77 +10,88 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { signInSchema } from "@/schemas/auth/signInSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { signIn } from "next-auth/react";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
+import { signUpSchema } from "@/schemas/auth/signUpSchema";
+import axios, { AxiosError } from "axios";
+import { ApiResponse } from "@/types/ApiResponse";
 
-type SignInFormValues = z.infer<typeof signInSchema>;
+type SignUpFormValues = z.infer<typeof signUpSchema>;
 
-const SignInPage = () => {
+const SignUpPage = () => {
   const router = useRouter();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const form = useForm<SignInFormValues>({
-    resolver: zodResolver(signInSchema),
+  const form = useForm<SignUpFormValues>({
+    resolver: zodResolver(signUpSchema),
     defaultValues: {
-      identifier: "",
+      username: "",
+      email: "",
       password: "",
     },
   });
 
-  const onSubmit = async (data: SignInFormValues) => {
+  const onSubmit = async (data: SignUpFormValues) => {
     setIsSubmitting(true);
-
-    const result = await signIn("credentials", {
-      redirect: false,
-      username: data.identifier,
-      password: data.password,
-    });
-
-    if (result?.error) {
-      if (result.error == "CredentialsSignin") {
-        toast({
-          title: "Login Failed",
-          description: "Incorrect username of password",
-          variant: "destructive",
-        });
-      } else {
-        toast({
-          title: "Error",
-          description: result.error,
-          variant: "destructive",
-        });
-      }
-    }
-    setIsSubmitting(false);
-
-    if (result?.url) {
-      router.push("/dashboard");
+    try {
+      const { email, username, password } = data;
+      const response = await axios.post("/api/auth/sign-up", {
+        email,
+        username,
+        password,
+      });
+      toast({ title: "Success", description: response.data.message });
+      router.replace(`/verify-email/${username}`);
+    } catch (error) {
+      console.error("Error in signup: " + error);
+      const axiosError = error as AxiosError<ApiResponse>;
+      const errorMessage = axiosError.response?.data.message;
+      toast({
+        title: "Error",
+        description: errorMessage ?? "Something went wrong",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
+
   return (
     <>
-      <p className="mb-4">Login to start your incognito adventure</p>
+      <p className="mb-6">Register to start your incognito journey</p>
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <FormField
             control={form.control}
-            name="identifier"
+            name="username"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Username / Email</FormLabel>
+                <FormLabel>Username</FormLabel>
                 <FormControl>
-                  <Input placeholder="Username/ Email" {...field} />
+                  <Input placeholder="Username" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel> Email</FormLabel>
+                <FormControl>
+                  <Input placeholder="Email" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -118,4 +129,4 @@ const SignInPage = () => {
   );
 };
 
-export default SignInPage;
+export default SignUpPage;
