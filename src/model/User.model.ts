@@ -8,7 +8,7 @@ export interface IUser {
   codeExpiry: Date | null;
   isVerified: boolean;
   isAcceptingMessages: boolean;
-  message: IMessage[];
+  messages: IMessage[];
 
   createdAt: Date;
   updatedAt: Date;
@@ -45,7 +45,7 @@ const UserSchema: Schema<IUser> = new Schema({
   codeExpiry: { type: Date, default: null, required: false },
   isVerified: { type: Boolean, default: false },
   isAcceptingMessages: { type: Boolean, default: true, required: true },
-  message: [MessageSchema],
+  messages: [MessageSchema],
 
   createdAt: { type: Date, default: Date.now, required: true },
   updatedAt: { type: Date, default: Date.now, required: true },

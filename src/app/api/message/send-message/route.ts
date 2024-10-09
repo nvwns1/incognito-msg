@@ -42,7 +42,7 @@ export async function POST(request: Request) {
       createdAt: new Date(),
     };
 
-    user.message.push(message);
+    user.messages.push(message);
     await user.save();
 
     return createResponse({
