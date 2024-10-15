@@ -5,27 +5,17 @@ import { IMessage } from "@/model/User.model";
 import { ApiResponse } from "@/types/ApiResponse";
 import axios, { AxiosError } from "axios";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 import { useCallback, useEffect, useState } from "react";
 
 const DashBoardPage = () => {
   const [message, setMessage] = useState<IMessage[]>([]);
-
   const { data: session } = useSession();
-  const user = session?.user;
+
+  const router = useRouter();
 
   const { toast } = useToast();
-
-  const baseUrl = `${window.location.protocol}//${window.location.host}`;
-  const profileUrl = `${baseUrl}/message/${user?.username}`;
-
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(profileUrl);
-    toast({
-      title: "URL Copied!",
-      description: "Profile URL has been copied to clipboard.",
-    });
-  };
 
   const fetchMessage = useCallback(async () => {
     try {
@@ -50,8 +40,24 @@ const DashBoardPage = () => {
       return;
     }
     fetchMessage();
-  }, [fetchMessage, session]);
+  }, [fetchMessage, session, router]);
 
+  if (!session || !session.user) {
+    return <div></div>;
+  }
+
+  const user = session?.user;
+
+  const baseUrl = `${window.location.protocol}//${window.location.host}`;
+  const profileUrl = `${baseUrl}/message/${user?.username}`;
+
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(profileUrl);
+    toast({
+      title: "URL Copied!",
+      description: "Profile URL has been copied to clipboard.",
+    });
+  };
   return (
     <div className="my-8 lg:mx-auto p-6 bg-white rounded w-full max-w-6xl ">
       <h1 className="text-4xl font-bold mb-4">User Dashboard</h1>
@@ -69,7 +75,7 @@ const DashBoardPage = () => {
       </div>
 
       <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
-        {message.length > 0 ? (
+        {user && message.length > 0 ? (
           message.map((msg, index) => (
             <div key={index} className="p-4 border border-gray-200 rounded-md">
               <p className="text-lg font-semibold mb-2">Message</p>

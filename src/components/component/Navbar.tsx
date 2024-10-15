@@ -3,10 +3,13 @@
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { Button } from "../ui/button";
+import { useRouter } from "next/navigation";
 
 const Navbar = () => {
   const { data: session } = useSession();
   const user = session?.user;
+
+  const router = useRouter();
 
   return (
     <nav className="p-4 md-p-6 shadow-md bg-gray-900 text-white z-10 relative">
@@ -28,6 +31,7 @@ const Navbar = () => {
         ) : (
           <Link href="/sign-in">
             <Button
+              onClick={() => router.replace("/sign-in")}
               className="w-full md:w-auto bg-slate-100 text-black"
               variant="outline"
             >
