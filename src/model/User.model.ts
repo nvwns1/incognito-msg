@@ -1,6 +1,6 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, { Schema, Document } from "mongoose";
 
-export interface IUser {
+export interface IUser extends Document {
   email: string;
   username: string;
   password: string;
@@ -14,7 +14,7 @@ export interface IUser {
   updatedAt: Date;
 }
 
-export interface IMessage {
+export interface IMessage extends Document {
   content: string;
   createdAt: Date;
 }

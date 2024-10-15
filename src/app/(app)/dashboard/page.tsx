@@ -1,4 +1,5 @@
 "use client";
+import MessageCard from "@/components/component/MessageCard";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { IMessage } from "@/model/User.model";
@@ -34,6 +35,12 @@ const DashBoardPage = () => {
       });
     }
   }, [toast]);
+
+  const handleMessageDelete = (messageId: string) => {
+    setMessage((prevMessages) =>
+      prevMessages.filter((msg) => msg._id !== messageId)
+    );
+  };
 
   useEffect(() => {
     if (!session || !session.user) {
@@ -77,10 +84,11 @@ const DashBoardPage = () => {
       <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
         {user && message.length > 0 ? (
           message.map((msg, index) => (
-            <div key={index} className="p-4 border border-gray-200 rounded-md">
-              <p className="text-lg font-semibold mb-2">Message</p>
-              <p>{msg.content}</p>
-            </div>
+            <MessageCard
+              key={index}
+              message={msg}
+              onMessageDelete={handleMessageDelete}
+            />
           ))
         ) : (
           <p>No messages found</p>
