@@ -2,7 +2,6 @@
 
 import React from "react";
 import { sendMessageSchema } from "@/schemas/messages/sendMessageSchema";
-import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -17,15 +16,14 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useCreateMessage } from "@/hooks/data/useMessage";
-
-type createMessageFormValues = z.infer<typeof sendMessageSchema>;
+import { createMessageFormValuesT } from "@/utils/types/messageType";
 
 const CreateMessage = ({ params }: { params: { username: string } }) => {
   const username = params.username;
 
   const { createMessageMutate, createMessagePending } = useCreateMessage();
 
-  const form = useForm<createMessageFormValues>({
+  const form = useForm<createMessageFormValuesT>({
     resolver: zodResolver(sendMessageSchema),
     defaultValues: {
       content: "",
@@ -33,7 +31,7 @@ const CreateMessage = ({ params }: { params: { username: string } }) => {
     },
   });
 
-  const onSubmit = async (data: createMessageFormValues) => {
+  const onSubmit = async (data: createMessageFormValuesT) => {
     createMessageMutate(data);
   };
 
