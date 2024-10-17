@@ -14,7 +14,7 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
-import { useResendCode, useVerifyEmail } from "@/hooks/data/useAuth";
+import { useAuth } from "@/hooks/data/useAuth";
 import { toast } from "@/hooks/use-toast";
 import { usernameSchema } from "@/schemas/auth/signUpSchema";
 import { verifyEmailSchema } from "@/schemas/auth/verifyEmailSchema";
@@ -24,8 +24,12 @@ import { Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 
 const VerifyEmailPage = ({ params }: { params: { username: string } }) => {
-  const { verifyEmailMutation, verifyEmailPending } = useVerifyEmail();
-  const { resendCodeMutate, resendCodePending } = useResendCode();
+  const {
+    verifyEmailMutation,
+    verifyEmailPending,
+    resendCodeMutate,
+    resendCodePending,
+  } = useAuth();
 
   const form = useForm<VerifyEmailT>({
     resolver: zodResolver(verifyEmailSchema),

@@ -16,11 +16,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
-import { useSignIn } from "@/hooks/data/useAuth";
+import { useAuth } from "@/hooks/data/useAuth";
 import { SignInFormValuesT } from "@/utils/types/authType";
 
 const SignInPage = () => {
-  const { signInFn, signInPending } = useSignIn();
+  const { signInFn, signInPending } = useAuth();
 
   const form = useForm<SignInFormValuesT>({
     resolver: zodResolver(signInSchema),

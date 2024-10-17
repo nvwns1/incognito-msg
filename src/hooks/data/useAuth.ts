@@ -14,8 +14,9 @@ import {
   VerifyEmailT,
 } from "@/utils/types/authType";
 
-export const useSignIn = () => {
+export const useAuth = () => {
   const { replace } = useRouter();
+
   const { mutate: signInFn, isPending: signInPending } = useMutation({
     mutationFn: async (loginData: SignInFormValuesT) => {
       return await signIn("credentials", {
@@ -48,11 +49,6 @@ export const useSignIn = () => {
     },
   });
 
-  return { signInFn, signInPending };
-};
-
-export const useSignUp = () => {
-  const { replace } = useRouter();
   const { mutate: signUp, isPending: signUpPending } = useMutation<
     ApiResponse,
     AxiosError,
@@ -71,12 +67,6 @@ export const useSignUp = () => {
     },
   });
 
-  return { signUp, signUpPending };
-};
-
-export const useVerifyEmail = () => {
-  const { replace } = useRouter();
-
   const { mutate: verifyEmailMutation, isPending: verifyEmailPending } =
     useMutation<ApiResponse, AxiosError, VerifyEmailT>({
       mutationFn: async (data: VerifyEmailT) => {
@@ -91,10 +81,6 @@ export const useVerifyEmail = () => {
       },
     });
 
-  return { verifyEmailMutation, verifyEmailPending };
-};
-
-export const useResendCode = () => {
   const { mutate: resendCodeMutate, isPending: resendCodePending } =
     useMutation<ApiResponse, AxiosError, string>({
       mutationFn: async (username: string) => {
@@ -107,5 +93,14 @@ export const useResendCode = () => {
       },
     });
 
-  return { resendCodeMutate, resendCodePending };
+  return {
+    signInFn,
+    signInPending,
+    signUp,
+    signUpPending,
+    verifyEmailMutation,
+    verifyEmailPending,
+    resendCodeMutate,
+    resendCodePending,
+  };
 };
