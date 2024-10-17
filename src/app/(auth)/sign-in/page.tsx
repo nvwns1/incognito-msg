@@ -13,21 +13,16 @@ import { Input } from "@/components/ui/input";
 import { signInSchema } from "@/schemas/auth/signInSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { signIn } from "next-auth/react";
-import { useToast } from "@/hooks/use-toast";
-import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
+import { useSignIn } from "@/hooks/data/useAuth";
 
 type SignInFormValues = z.infer<typeof signInSchema>;
 
 const SignInPage = () => {
-  const router = useRouter();
-  const { toast } = useToast();
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { signInFn, signInPending } = useSignIn();
 
   const form = useForm<SignInFormValues>({
     resolver: zodResolver(signInSchema),
@@ -38,34 +33,7 @@ const SignInPage = () => {
   });
 
   const onSubmit = async (data: SignInFormValues) => {
-    setIsSubmitting(true);
-
-    const result = await signIn("credentials", {
-      redirect: false,
-      username: data.identifier,
-      password: data.password,
-    });
-
-    if (result?.error) {
-      if (result.error == "CredentialsSignin") {
-        toast({
-          title: "Login Failed",
-          description: "Incorrect username of password",
-          variant: "destructive",
-        });
-      } else {
-        toast({
-          title: "Error",
-          description: result.error,
-          variant: "destructive",
-        });
-      }
-    }
-    setIsSubmitting(false);
-
-    if (result?.url) {
-      router.push("/dashboard");
-    }
+    signInFn(data);
   };
   return (
     <>
@@ -100,7 +68,7 @@ const SignInPage = () => {
             )}
           />
           <Button type="submit">
-            {isSubmitting ? (
+            {signInPending ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             ) : (
               "Login"
