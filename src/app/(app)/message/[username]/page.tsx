@@ -3,9 +3,6 @@
 import React from "react";
 import { sendMessageSchema } from "@/schemas/messages/sendMessageSchema";
 import * as z from "zod";
-import axios, { AxiosError } from "axios";
-import { ApiResponse } from "@/types/ApiResponse";
-import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -19,12 +16,14 @@ import {
 } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { useCreateMessage } from "@/hooks/data/useMessage";
 
 type createMessageFormValues = z.infer<typeof sendMessageSchema>;
 
 const CreateMessage = ({ params }: { params: { username: string } }) => {
   const username = params.username;
-  const { toast } = useToast();
+
+  const { createMessageMutate, createMessagePending } = useCreateMessage();
 
   const form = useForm<createMessageFormValues>({
     resolver: zodResolver(sendMessageSchema),
@@ -35,24 +34,7 @@ const CreateMessage = ({ params }: { params: { username: string } }) => {
   });
 
   const onSubmit = async (data: createMessageFormValues) => {
-    const { content } = data;
-    try {
-      const response = await axios.post("/api/message/send-message", {
-        username,
-        content,
-      });
-      toast({ title: "Success", description: response.data.message });
-
-      form.setValue("content", "");
-    } catch (error) {
-      const axiosError = error as AxiosError<ApiResponse>;
-      const errorMessage = axiosError?.response?.data.message;
-      toast({
-        title: "Error",
-        description: errorMessage ?? "Something went wrong",
-        variant: "destructive",
-      });
-    }
+    createMessageMutate(data);
   };
 
   return (
@@ -84,7 +66,9 @@ const CreateMessage = ({ params }: { params: { username: string } }) => {
                 </FormItem>
               )}
             />
-            <Button type="submit">Submit</Button>
+            <Button type="submit" disabled={createMessagePending}>
+              {createMessagePending ? "Sending..." : "Submit"}
+            </Button>
           </form>
         </Form>
       </div>
