@@ -15,6 +15,8 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 import { useResendCode, useVerifyEmail } from "@/hooks/data/useAuth";
+import { toast } from "@/hooks/use-toast";
+import { usernameSchema } from "@/schemas/auth/signUpSchema";
 import { verifyEmailSchema } from "@/schemas/auth/verifyEmailSchema";
 import { VerifyEmailT } from "@/utils/types/authType";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -38,6 +40,17 @@ const VerifyEmailPage = ({ params }: { params: { username: string } }) => {
   };
 
   const handleResend = async (): Promise<void> => {
+    const validationResult = usernameSchema.safeParse({
+      username: params.username,
+    });
+    if (!validationResult.success) {
+      toast({
+        title: "Error",
+        description: "Username is invalid",
+        variant: "destructive",
+      });
+      return;
+    }
     if (!resendCodePending) resendCodeMutate(params.username);
   };
 
