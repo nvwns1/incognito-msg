@@ -14,20 +14,18 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
-import { useToast } from "@/hooks/use-toast";
+import { useResendCode, useVerifyEmail } from "@/hooks/data/useAuth";
 import { verifyEmailSchema } from "@/schemas/auth/verifyEmailSchema";
-import { ApiResponse } from "@/types/ApiResponse";
+import { VerifyEmailT } from "@/utils/types/authType";
 import { zodResolver } from "@hookform/resolvers/zod";
-import axios, { AxiosError } from "axios";
-import { useRouter } from "next/navigation";
+import { Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
-import * as z from "zod";
 
 const VerifyEmailPage = ({ params }: { params: { username: string } }) => {
-  const router = useRouter();
-  const { toast } = useToast();
+  const { verifyEmailMutation, verifyEmailPending } = useVerifyEmail();
+  const { resendCodeMutate, resendCodePending } = useResendCode();
 
-  const form = useForm<z.infer<typeof verifyEmailSchema>>({
+  const form = useForm<VerifyEmailT>({
     resolver: zodResolver(verifyEmailSchema),
     defaultValues: {
       username: params.username,
@@ -35,44 +33,12 @@ const VerifyEmailPage = ({ params }: { params: { username: string } }) => {
     },
   });
 
-  const onSubmit = async (data: z.infer<typeof verifyEmailSchema>) => {
-    try {
-      const { username, code } = data;
-      const response = await axios.post("/api/auth/verify-email", {
-        username,
-        code,
-      });
-      toast({ title: "Success", description: response.data.message });
-      router.replace("/sign-in");
-    } catch (error) {
-      console.error("Error in verify email: " + error);
-      const axiosError = error as AxiosError<ApiResponse>;
-      const errorMessage = axiosError.response?.data.message;
-      toast({
-        title: "Error",
-        description: errorMessage ?? "Something went wrong",
-        variant: "destructive",
-      });
-    }
+  const onSubmit = async (data: VerifyEmailT) => {
+    verifyEmailMutation(data);
   };
 
   const handleResend = async (): Promise<void> => {
-    try {
-      const response = await axios.post("/api/auth/regenerate-verify-email", {
-        username: params.username,
-      });
-      toast({ title: "Success", description: response.data.message });
-    } catch (error) {
-      console.error("Error in regenerating code: " + error);
-      const axiosError = error as AxiosError<ApiResponse>;
-      const errorMessage = axiosError.response?.data.message;
-
-      toast({
-        title: "Error",
-        description: errorMessage ?? "Something went wrong",
-        variant: "destructive",
-      });
-    }
+    if (!resendCodePending) resendCodeMutate(params.username);
   };
 
   return (
@@ -103,7 +69,13 @@ const VerifyEmailPage = ({ params }: { params: { username: string } }) => {
               </FormItem>
             )}
           />
-          <Button type="submit">Submit</Button>
+          <Button type="submit" disabled={verifyEmailPending}>
+            {verifyEmailPending ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              "Verify"
+            )}
+          </Button>
         </form>
       </Form>
 
@@ -113,7 +85,11 @@ const VerifyEmailPage = ({ params }: { params: { username: string } }) => {
           onClick={handleResend}
           className="underline hover:text-gray-500 hover:cursor-pointer"
         >
-          Resend
+          {resendCodePending ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            "Resend"
+          )}
         </span>
       </p>
     </>

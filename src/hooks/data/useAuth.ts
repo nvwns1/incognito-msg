@@ -7,8 +7,12 @@ import { toast } from "../use-toast";
 import { ApiResponse } from "@/types/ApiResponse";
 import { handleAxiosError } from "@/utils/errorHandler";
 import { signIn } from "next-auth/react";
-import { signUpUser } from "@/utils/apis/authApis";
-import { SignInFormValuesT, SignUpFormValuesT } from "@/utils/types/authType";
+import { resendCode, signUpUser, verifyUser } from "@/utils/apis/authApis";
+import {
+  SignInFormValuesT,
+  SignUpFormValuesT,
+  VerifyEmailT,
+} from "@/utils/types/authType";
 
 export const useSignIn = () => {
   const { replace } = useRouter();
@@ -68,4 +72,40 @@ export const useSignUp = () => {
   });
 
   return { signUp, signUpPending };
+};
+
+export const useVerifyEmail = () => {
+  const { replace } = useRouter();
+
+  const { mutate: verifyEmailMutation, isPending: verifyEmailPending } =
+    useMutation<ApiResponse, AxiosError, VerifyEmailT>({
+      mutationFn: async (data: VerifyEmailT) => {
+        return await verifyUser(data);
+      },
+      onSuccess: (data: ApiResponse) => {
+        toast({ title: "Success", description: data.message });
+        replace("/sign-in");
+      },
+      onError: (error) => {
+        handleAxiosError(error);
+      },
+    });
+
+  return { verifyEmailMutation, verifyEmailPending };
+};
+
+export const useResendCode = () => {
+  const { mutate: resendCodeMutate, isPending: resendCodePending } =
+    useMutation<ApiResponse, AxiosError, string>({
+      mutationFn: async (username: string) => {
+        return resendCode(username);
+      },
+      onSuccess: (data) => {
+        console.log(data);
+        console.log(data.message);
+        toast({ title: "Success", description: data.message });
+      },
+    });
+
+  return { resendCodeMutate, resendCodePending };
 };
