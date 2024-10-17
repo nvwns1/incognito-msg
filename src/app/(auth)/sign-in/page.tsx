@@ -14,17 +14,15 @@ import { signInSchema } from "@/schemas/auth/signInSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { useForm } from "react-hook-form";
-import * as z from "zod";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useSignIn } from "@/hooks/data/useAuth";
-
-type SignInFormValues = z.infer<typeof signInSchema>;
+import { SignInFormValuesT } from "@/utils/types/authType";
 
 const SignInPage = () => {
   const { signInFn, signInPending } = useSignIn();
 
-  const form = useForm<SignInFormValues>({
+  const form = useForm<SignInFormValuesT>({
     resolver: zodResolver(signInSchema),
     defaultValues: {
       identifier: "",
@@ -32,7 +30,7 @@ const SignInPage = () => {
     },
   });
 
-  const onSubmit = async (data: SignInFormValues) => {
+  const onSubmit = async (data: SignInFormValuesT) => {
     signInFn(data);
   };
   return (

@@ -13,18 +13,16 @@ import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { useForm } from "react-hook-form";
-import * as z from "zod";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { signUpSchema } from "@/schemas/auth/signUpSchema";
 import { useSignUp } from "@/hooks/data/useAuth";
-
-type SignUpFormValues = z.infer<typeof signUpSchema>;
+import { SignUpFormValuesT } from "@/utils/types/authType";
 
 const SignUpPage = () => {
   const { signUp, signUpPending } = useSignUp();
 
-  const form = useForm<SignUpFormValues>({
+  const form = useForm<SignUpFormValuesT>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
       username: "",
@@ -33,7 +31,7 @@ const SignUpPage = () => {
     },
   });
 
-  const onSubmit = async (data: SignUpFormValues) => {
+  const onSubmit = async (data: SignUpFormValuesT) => {
     signUp(data);
   };
   return (

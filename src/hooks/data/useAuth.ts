@@ -1,23 +1,19 @@
 "use client";
 
-import { signUpSchema } from "@/schemas/auth/signUpSchema";
 import { useMutation } from "@tanstack/react-query";
-import axios, { AxiosError } from "axios";
+import { AxiosError } from "axios";
 import { useRouter } from "next/navigation";
-import * as z from "zod";
 import { toast } from "../use-toast";
 import { ApiResponse } from "@/types/ApiResponse";
 import { handleAxiosError } from "@/utils/errorHandler";
-import { signInSchema } from "@/schemas/auth/signInSchema";
 import { signIn } from "next-auth/react";
-
-type SignUpFormValues = z.infer<typeof signUpSchema>;
-type SignInFormValues = z.infer<typeof signInSchema>;
+import { signUpUser } from "@/utils/apis/authApis";
+import { SignInFormValuesT, SignUpFormValuesT } from "@/utils/types/authType";
 
 export const useSignIn = () => {
   const { replace } = useRouter();
   const { mutate: signInFn, isPending: signInPending } = useMutation({
-    mutationFn: async (loginData: SignInFormValues) => {
+    mutationFn: async (loginData: SignInFormValuesT) => {
       return await signIn("credentials", {
         username: loginData.identifier,
         password: loginData.password,
@@ -56,12 +52,12 @@ export const useSignUp = () => {
   const { mutate: signUp, isPending: signUpPending } = useMutation<
     ApiResponse,
     AxiosError,
-    SignUpFormValues
+    SignUpFormValuesT
   >({
-    mutationFn: async (data: SignUpFormValues) => {
-      return await axios.post("/api/auth/sign-up", data);
+    mutationFn: async (data: SignUpFormValuesT) => {
+      return await signUpUser(data);
     },
-    onSuccess: (data: ApiResponse, variables: SignUpFormValues) => {
+    onSuccess: (data: ApiResponse, variables: SignUpFormValuesT) => {
       const { username } = variables; // username is part of SignUpFormValues
       toast({ title: "Success", description: data.message });
       replace(`/verify-email/${username}`);
