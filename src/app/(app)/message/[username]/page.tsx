@@ -15,13 +15,13 @@ import {
 } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { useCreateMessage } from "@/hooks/data/useMessage";
+import { useMessages } from "@/hooks/data/useMessage";
 import { createMessageFormValuesT } from "@/utils/types/messageType";
 
 const CreateMessage = ({ params }: { params: { username: string } }) => {
   const username = params.username;
 
-  const { createMessageMutate, createMessagePending } = useCreateMessage();
+  const { createMessageMutate, createMessagePending } = useMessages();
 
   const form = useForm<createMessageFormValuesT>({
     resolver: zodResolver(sendMessageSchema),

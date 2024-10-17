@@ -13,37 +13,19 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "../ui/button";
-import { ApiResponse } from "@/types/ApiResponse";
-import axios, { AxiosError } from "axios";
-import { useToast } from "@/hooks/use-toast";
+import { useMessages } from "@/hooks/data/useMessage";
 
 type MessageCardProps = {
   message: IMessage;
-  onMessageDelete: (messageId: string) => void;
 };
-const MessageCard = ({ message, onMessageDelete }: MessageCardProps) => {
-  const { toast } = useToast();
+
+const MessageCard = ({ message }: MessageCardProps) => {
+  const { deleteMessageMutate } = useMessages();
 
   const handleDeleteConfirm = async () => {
-    try {
-      const response = await axios.delete<ApiResponse>(
-        `/api/message/delete-message/${message._id}`
-      );
-      toast({
-        title: "Success",
-        description: response.data.message,
-      });
-      onMessageDelete(message._id as string);
-    } catch (error) {
-      const axiosError = error as AxiosError<ApiResponse>;
-      toast({
-        title: "Error",
-        description:
-          axiosError.response?.data.message ?? "Something went wrong",
-        variant: "destructive",
-      });
-    }
+    deleteMessageMutate(message._id as string);
   };
+
   return (
     <Card>
       <CardHeader>

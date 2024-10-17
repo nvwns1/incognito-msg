@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
-import { IMessage } from "@/model/User.model";
 import { isAcceptingMessageSchema } from "@/schemas/messages/isAcceptingMessageSchema";
 import { ApiResponse } from "@/types/ApiResponse";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -13,11 +12,12 @@ import { Separator } from "@/components/ui/separator";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { useMessages } from "@/hooks/data/useMessage";
 
 const DashBoardPage = () => {
-  const [message, setMessage] = useState<IMessage[]>([]);
+  const { messages } = useMessages();
   const { data: session } = useSession();
 
   const router = useRouter();
@@ -70,37 +70,12 @@ const DashBoardPage = () => {
     }
   };
 
-  const fetchMessage = useCallback(async () => {
-    try {
-      const { data } = await axios.get<ApiResponse>(
-        "/api/message/get-messages"
-      );
-      const { messages } = data;
-      setMessage(messages || []);
-    } catch (error) {
-      const axiosError = error as AxiosError<ApiResponse>;
-      toast({
-        title: "Error",
-        description:
-          axiosError.response?.data.message ?? "Something went wrong",
-        variant: "destructive",
-      });
-    }
-  }, [toast]);
-
-  const handleMessageDelete = (messageId: string) => {
-    setMessage((prevMessages) =>
-      prevMessages.filter((msg) => msg._id !== messageId)
-    );
-  };
-
   useEffect(() => {
     if (!session || !session.user) {
       return;
     }
-    fetchMessage();
     fetchAcceptMessages();
-  }, [fetchMessage, session, router, fetchAcceptMessages]);
+  }, [session, router, fetchAcceptMessages]);
 
   if (!session || !session.user) {
     return <div></div>;
@@ -149,13 +124,9 @@ const DashBoardPage = () => {
       <Separator className="my-4" />
 
       <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
-        {user && message.length > 0 ? (
-          message.map((msg, index) => (
-            <MessageCard
-              key={index}
-              message={msg}
-              onMessageDelete={handleMessageDelete}
-            />
+        {user && messages && messages.length > 0 ? (
+          messages.map((msg, index) => (
+            <MessageCard key={index} message={msg} />
           ))
         ) : (
           <p>No messages found</p>
