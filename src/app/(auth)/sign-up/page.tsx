@@ -12,23 +12,17 @@ import {
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { useToast } from "@/hooks/use-toast";
-import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { signUpSchema } from "@/schemas/auth/signUpSchema";
-import axios, { AxiosError } from "axios";
-import { ApiResponse } from "@/types/ApiResponse";
+import { useSignUp } from "@/hooks/data/useAuth";
 
 type SignUpFormValues = z.infer<typeof signUpSchema>;
 
 const SignUpPage = () => {
-  const router = useRouter();
-  const { toast } = useToast();
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { signUp, signUpPending } = useSignUp();
 
   const form = useForm<SignUpFormValues>({
     resolver: zodResolver(signUpSchema),
@@ -40,30 +34,8 @@ const SignUpPage = () => {
   });
 
   const onSubmit = async (data: SignUpFormValues) => {
-    setIsSubmitting(true);
-    try {
-      const { email, username, password } = data;
-      const response = await axios.post("/api/auth/sign-up", {
-        email,
-        username,
-        password,
-      });
-      toast({ title: "Success", description: response.data.message });
-      router.replace(`/verify-email/${username}`);
-    } catch (error) {
-      console.error("Error in signup: " + error);
-      const axiosError = error as AxiosError<ApiResponse>;
-      const errorMessage = axiosError.response?.data.message;
-      toast({
-        title: "Error",
-        description: errorMessage ?? "Something went wrong",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+    signUp(data);
   };
-
   return (
     <>
       <p className="mb-6">Register to start your incognito journey</p>
@@ -111,10 +83,10 @@ const SignUpPage = () => {
             )}
           />
           <Button type="submit">
-            {isSubmitting ? (
+            {signUpPending ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             ) : (
-              "Login"
+              "Sign Up"
             )}
           </Button>
         </form>
