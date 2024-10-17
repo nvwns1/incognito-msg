@@ -1,7 +1,9 @@
 import { ApiResponse } from "@/types/ApiResponse";
 import {
+  changeAcceptMessagesApi,
   createMessageApi,
   deleteMessageApi,
+  getAcceptMessagesApi,
   getMessagesApi,
 } from "@/utils/apis/messageApis";
 import { createMessageFormValuesT } from "@/utils/types/messageType";
@@ -71,11 +73,32 @@ export const useMessages = () => {
     },
   });
 
+  // Get Accepting Message flag
+  const { data: isAcceptingMessage } = useQuery({
+    queryKey: ["acceptMessages"],
+    queryFn: getAcceptMessagesApi,
+  });
+
+  // Change the Accepting Message flag
+  const { mutate: switchChangeMutate, isPending: switchChangePending } =
+    useMutation<ApiResponse, AxiosError, boolean>({
+      mutationFn: async (isAcceptingMessages: boolean) => {
+        return changeAcceptMessagesApi(isAcceptingMessages);
+      },
+      onSuccess: (data) => {
+        toast({ title: "Success", description: data.message });
+      },
+      onError: handleAxiosError,
+    });
+
   return {
     messages,
     messagesFetching,
     createMessageMutate,
     createMessagePending,
     deleteMessageMutate,
+    isAcceptingMessage,
+    switchChangeMutate,
+    switchChangePending,
   };
 };

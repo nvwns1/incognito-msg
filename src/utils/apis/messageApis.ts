@@ -18,3 +18,18 @@ export const deleteMessageApi = async (messageId: string) => {
   );
   return response.data;
 };
+
+export const getAcceptMessagesApi = async () => {
+  const { data } = await axios.get<ApiResponse>("/api/message/accept-message");
+
+  return data.isAcceptingMessages;
+};
+
+export const changeAcceptMessagesApi = async (value: boolean) => {
+  const { data } = await axios.post<ApiResponse>(
+    "/api/message/accept-message",
+    { isAcceptingMessages: value }
+  );
+
+  return data;
+};

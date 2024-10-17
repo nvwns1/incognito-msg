@@ -5,22 +5,17 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { isAcceptingMessageSchema } from "@/schemas/messages/isAcceptingMessageSchema";
-import { ApiResponse } from "@/types/ApiResponse";
 import { zodResolver } from "@hookform/resolvers/zod";
-import axios, { AxiosError } from "axios";
 import { Separator } from "@/components/ui/separator";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
 
-import { useCallback, useEffect } from "react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useMessages } from "@/hooks/data/useMessage";
 
 const DashBoardPage = () => {
-  const { messages } = useMessages();
+  const { messages, isAcceptingMessage, switchChangeMutate } = useMessages();
   const { data: session } = useSession();
-
-  const router = useRouter();
 
   const { toast } = useToast();
 
@@ -28,54 +23,21 @@ const DashBoardPage = () => {
 
   const { register, watch, setValue } = form;
   const acceptMessages = watch("acceptMessages");
-  const fetchAcceptMessages = useCallback(async () => {
-    try {
-      const response = await axios.get<ApiResponse>(
-        "/api/message/accept-message"
-      );
-      const { isAcceptingMessages } = response.data;
-      setValue("acceptMessages", isAcceptingMessages);
-    } catch (error) {
-      const axiosError = error as AxiosError<ApiResponse>;
-      toast({
-        title: "Error",
-        description:
-          axiosError.response?.data.message ?? "Something went wrong",
-        variant: "destructive",
-      });
-    }
-  }, [setValue, toast]);
+
+  useEffect(() => {
+    setValue("acceptMessages", isAcceptingMessage);
+  }, [isAcceptingMessage, setValue]);
 
   const handleSwitchChange = async () => {
-    try {
-      const response = await axios.post<ApiResponse>(
-        "/api/message/accept-message",
-        {
-          isAcceptingMessages: !acceptMessages,
-        }
-      );
-      setValue("acceptMessages", !acceptMessages);
-      toast({
-        title: "Success",
-        description: response.data.message,
-      });
-    } catch (error) {
-      const axiosError = error as AxiosError<ApiResponse>;
-      toast({
-        title: "Error",
-        description:
-          axiosError.response?.data.message ?? "Something went wrong",
-        variant: "destructive",
-      });
-    }
+    switchChangeMutate(!acceptMessages);
+    setValue("acceptMessages", !acceptMessages);
   };
 
   useEffect(() => {
     if (!session || !session.user) {
       return;
     }
-    fetchAcceptMessages();
-  }, [session, router, fetchAcceptMessages]);
+  }, [session]);
 
   if (!session || !session.user) {
     return <div></div>;
