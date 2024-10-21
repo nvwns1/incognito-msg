@@ -33,6 +33,7 @@ const CreateMessage = ({ params }: { params: { username: string } }) => {
 
   const onSubmit = async (data: createMessageFormValuesT) => {
     createMessageMutate(data);
+    form.reset();
   };
 
   return (
