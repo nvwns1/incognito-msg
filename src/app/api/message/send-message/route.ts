@@ -37,12 +37,12 @@ export async function POST(request: Request) {
       });
     }
 
-    const message: IMessage = {
+    const message = {
       content,
       createdAt: new Date(),
     };
 
-    user.messages.push(message);
+    user.messages.push(message as IMessage);
     await user.save();
 
     return createResponse({
